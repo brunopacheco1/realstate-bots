@@ -12,4 +12,5 @@ public class Filter extends PanacheMongoEntity {
     private final BigDecimal budget;
     private final PropertyType propertyType;
     private final TransactionType transactionType;
+    private final String recipient;
 }

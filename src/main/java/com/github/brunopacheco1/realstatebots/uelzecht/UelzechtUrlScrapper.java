@@ -48,7 +48,7 @@ public class UelzechtUrlScrapper {
 
                     Elements properties = doc.select("div.content_annonce_bien > div.image > a");
                     properties.forEach(property -> {
-                        String propertyUrl = "https://www.uelzecht.lu/" + property.attr("href");
+                        String propertyUrl = "https://www.uelzecht.lu/" + property.attr("href").split("_")[0];
                         urlEmitter.send(propertyUrl);
                     });
                     page++;
