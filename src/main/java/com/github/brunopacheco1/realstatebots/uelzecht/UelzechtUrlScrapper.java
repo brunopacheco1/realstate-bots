@@ -1,21 +1,19 @@
 package com.github.brunopacheco1.realstatebots.uelzecht;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
-
 import javax.enterprise.context.ApplicationScoped;
-
+import javax.inject.Inject;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.java.Log;
 
@@ -23,9 +21,11 @@ import lombok.extern.java.Log;
 @Log
 public class UelzechtUrlScrapper {
 
+    @Inject
+    @Channel("uelzecht-crawler") Emitter<String> urlEmitter;
+
     @Scheduled(cron = "{scheduler.uelzecht}")
-    public void cronJobWithExpressionInConfig() {
-        List<String> urls = new ArrayList<>();
+    public void produces() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             int page = 1;
             Integer pages = null;
@@ -47,7 +47,10 @@ public class UelzechtUrlScrapper {
                     }
 
                     Elements properties = doc.select("div.content_annonce_bien > div.image > a");
-                    properties.forEach(property -> urls.add("https://www.uelzecht.lu/" + property.attr("href")));
+                    properties.forEach(property -> {
+                        String propertyUrl = "https://www.uelzecht.lu/" + property.attr("href");
+                        urlEmitter.send(propertyUrl);
+                    });
                     page++;
                     continue;
                 }
@@ -56,6 +59,5 @@ public class UelzechtUrlScrapper {
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
         }
-        log.info(String.valueOf(urls.size()));
     }
 }
