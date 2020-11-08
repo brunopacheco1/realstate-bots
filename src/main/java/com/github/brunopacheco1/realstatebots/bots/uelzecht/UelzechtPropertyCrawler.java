@@ -9,6 +9,8 @@ import com.github.brunopacheco1.realstatebots.domain.Property;
 import com.github.brunopacheco1.realstatebots.domain.PropertyType;
 import com.github.brunopacheco1.realstatebots.domain.Source;
 import com.github.brunopacheco1.realstatebots.domain.TransactionType;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -39,13 +41,13 @@ public class UelzechtPropertyCrawler {
 
             if (entity != null) {
                 Document doc = Jsoup.parse(EntityUtils.toString(entity));
-                String location = doc.select("span#ville_details").text();
+                String location = doc.select("span#ville_details").text().toUpperCase();
                 BigDecimal value = getPrice(doc.select("span#prix_details").text());
                 PropertyType propertyType = getPropertyType(doc.select("span#type_details").text());
                 TransactionType transactionType = url.endsWith("vente") ? TransactionType.BUY : TransactionType.RENT;
                 Source source = Source.UELZECHT;
-
-                return new Property(location, value, propertyType, transactionType, url, source);
+                String id = DigestUtils.sha3_256Hex(url + source);
+                return new Property(id, location, value, propertyType, transactionType, url, source);
             }
             throw new Exception("Empty body");
         } catch (Exception e) {

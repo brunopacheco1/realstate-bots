@@ -1,22 +1,30 @@
 package com.github.brunopacheco1.realstatebots.consumers;
 
+import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import com.github.brunopacheco1.realstatebots.domain.Property;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import lombok.extern.java.Log;
 
 @ApplicationScoped
-@Log
 public class PropertyPersister {
 
+    @Inject
+    @Channel(PubSubConstants.PERCOLATING_PROPERTY)
+    Emitter<Property> propertyEmitter;
+
     @Incoming(PubSubConstants.INCOMING_PROPERTY)
-    @Outgoing(PubSubConstants.PERCOLATING_PROPERTY)
-    public Property persist(Message<Property> message) {
+    public CompletionStage<Void> persist(Message<Property> message) {
         Property property = message.getPayload();
-        property.persist();
-        // TODO - avoid duplicated entries
-        return property;
+        Optional<Property> exists = Property.findByIdOptional(property.getId());
+        if (exists.isEmpty()) {
+            property.persist();
+            propertyEmitter.send(property);
+        }
+        return message.ack();
     }
 }

@@ -6,10 +6,8 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import io.smallrye.reactive.messaging.annotations.Broadcast;
-import lombok.extern.java.Log;
 
 @ApplicationScoped
-@Log
 public class FilterPersister {
 
     @Incoming(PubSubConstants.INCOMING_FILTER)

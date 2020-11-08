@@ -1,4 +1,4 @@
-package com.github.brunopacheco1.realstatebots.resources;
+package com.github.brunopacheco1.realstatebots.api;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -6,16 +6,17 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import com.github.brunopacheco1.realstatebots.consumers.PubSubConstants;
 import com.github.brunopacheco1.realstatebots.domain.Filter;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("/api/v1/filter")
-public class FilterResource {
+public class FilterApi {
 
     @Inject
-    @Channel("incoming-filter")
+    @Channel(PubSubConstants.INCOMING_FILTER)
     Emitter<Filter> filterEmitter;
 
     @POST

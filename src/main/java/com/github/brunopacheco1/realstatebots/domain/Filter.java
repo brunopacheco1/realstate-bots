@@ -5,15 +5,19 @@ import java.util.Set;
 
 import io.quarkus.mongodb.panache.MongoEntity;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @MongoEntity(collection="filters")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Filter extends PanacheMongoEntity {
-    private final BigDecimal budget;
-    private final PropertyType propertyType;
-    private final TransactionType transactionType;
-    private final Set<String> recipients;
+    private BigDecimal budget;
+    private PropertyType propertyType;
+    private TransactionType transactionType;
+    private Set<String> recipients;
 }

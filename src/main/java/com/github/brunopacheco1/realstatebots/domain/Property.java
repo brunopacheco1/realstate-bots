@@ -1,19 +1,28 @@
 package com.github.brunopacheco1.realstatebots.domain;
 
 import java.math.BigDecimal;
-import io.quarkus.mongodb.panache.MongoEntity;
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-@MongoEntity(collection="properties")
+import org.bson.codecs.pojo.annotations.BsonId;
+
+import io.quarkus.mongodb.panache.MongoEntity;
+import io.quarkus.mongodb.panache.PanacheMongoEntityBase;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@MongoEntity(collection = "properties")
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class Property extends PanacheMongoEntity {
-    private final String location;
-    private final BigDecimal value;
-    private final PropertyType propertyType;
-    private final TransactionType transactionType;
-    private final String url;
-    private final Source source;
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Property extends PanacheMongoEntityBase {
+    @BsonId
+    private String id;
+    private String location;
+    private BigDecimal value;
+    private PropertyType propertyType;
+    private TransactionType transactionType;
+    private String url;
+    private Source source;
 }

@@ -62,5 +62,6 @@ public class UelzechtUrlScrapper {
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
         }
+        log.info("Finished crawling.");
     }
 }

@@ -38,35 +38,35 @@ public class TrieTreeNodeTest {
 
     @Test
     public void should_return_none_recipient_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, BigDecimal.valueOf(100000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(100000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
         Set<String> recipients = root.query(query);
         assertTrue(recipients.isEmpty());
     }
 
     @Test
     public void should_return_one_recipient_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, BigDecimal.valueOf(600000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(600000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
         Set<String> recipients = root.query(query);
         assertTrue(recipients.size() == 1);
     }
 
     @Test
     public void should_return_two_recipients_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, BigDecimal.valueOf(700000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(700000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
         Set<String> recipients = root.query(query);
         assertTrue(recipients.size() == 2);
     }
 
     @Test
     public void should_return_three_recipients_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, BigDecimal.valueOf(900000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(900000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
         Set<String> recipients = root.query(query);
         assertTrue(recipients.size() == 3);
     }
 
     @Test
     public void should_return_three_recipients_given_property_type() {
-        TrieTreeQueryNode query = getQuery(new Property(null, BigDecimal.valueOf(900000), PropertyType.HOUSE, TransactionType.BUY, null, null));
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(900000), PropertyType.HOUSE, TransactionType.BUY, null, null));
         Set<String> recipients = root.query(query);
         assertTrue(recipients.size() == 3);
     }
