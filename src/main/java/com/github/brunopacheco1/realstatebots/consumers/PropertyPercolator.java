@@ -49,7 +49,7 @@ public class PropertyPercolator {
     }
 
     private void addFilter(Filter filter) {
-        TrieTreeNode budgetNode = new TrieTreeNode(filter.getBudget(), filter.getRecipients());
+        TrieTreeNode budgetNode = new TrieTreeNode(filter.getBudget(), filter.asRecipientsConfigurations());
         TrieTreeNode propertyTypeNode = new TrieTreeNode(filter.getPropertyType());
         TrieTreeNode transactionTypeNode = new TrieTreeNode(filter.getTransactionType());
 
@@ -62,12 +62,14 @@ public class PropertyPercolator {
     public CompletionStage<Void> percolate(Message<Property> message) {
         Property property = message.getPayload();
         TrieTreeQueryNode query = getQuery(property);
-        Set<String> recipients = root.query(query);
+        Set<SlackRecipientsConfiguration> configs = root.query(query);
 
-        if (!recipients.isEmpty()) {
+        if (!configs.isEmpty()) {
             String body = property.getUrl();
-            Notification notification = new Notification(recipients, body);
-            notificationEmitter.send(notification);
+            for (SlackRecipientsConfiguration config : configs) {
+                Notification notification = new Notification(config, body);
+                notificationEmitter.send(notification);
+            }
         }
         return message.ack();
     }

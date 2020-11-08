@@ -21,13 +21,17 @@ public class TrieTreeNodeTest {
     public void setUp() {
         root = new TrieTreeNode(null);
 
-        addFilterToTree(new Filter(BigDecimal.valueOf(600000), null, TransactionType.BUY, Sets.newHashSet("email")));
-        addFilterToTree(new Filter(BigDecimal.valueOf(700000), PropertyType.HOUSE, TransactionType.BUY, Sets.newHashSet("email1")));
-        addFilterToTree(new Filter(BigDecimal.valueOf(900000), null, TransactionType.BUY, Sets.newHashSet("email2")));
+        String webhook = "webhook";
+        addFilterToTree(
+                new Filter(BigDecimal.valueOf(600000), null, TransactionType.BUY, webhook, Sets.newHashSet("email")));
+        addFilterToTree(new Filter(BigDecimal.valueOf(700000), PropertyType.HOUSE, TransactionType.BUY, webhook,
+                Sets.newHashSet("email1")));
+        addFilterToTree(
+                new Filter(BigDecimal.valueOf(900000), null, TransactionType.BUY, webhook, Sets.newHashSet("email2")));
     }
 
     private void addFilterToTree(Filter filter) {
-        TrieTreeNode budgetNode = new TrieTreeNode(filter.getBudget(), filter.getRecipients());
+        TrieTreeNode budgetNode = new TrieTreeNode(filter.getBudget(), filter.asRecipientsConfigurations());
         TrieTreeNode propertyTypeNode = new TrieTreeNode(filter.getPropertyType());
         TrieTreeNode transactionTypeNode = new TrieTreeNode(filter.getTransactionType());
 
@@ -37,38 +41,43 @@ public class TrieTreeNodeTest {
     }
 
     @Test
-    public void should_return_none_recipient_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(100000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
-        Set<String> recipients = root.query(query);
-        assertTrue(recipients.isEmpty());
+    public void should_return_none_recipients_config_given_budget() {
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(100000), PropertyType.APPARTMENT,
+                TransactionType.BUY, null, null));
+        Set<SlackRecipientsConfiguration> configurations = root.query(query);
+        assertTrue(configurations.isEmpty());
     }
 
     @Test
-    public void should_return_one_recipient_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(600000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
-        Set<String> recipients = root.query(query);
-        assertTrue(recipients.size() == 1);
+    public void should_return_one_recipients_config_given_budget() {
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(600000), PropertyType.APPARTMENT,
+                TransactionType.BUY, null, null));
+        Set<SlackRecipientsConfiguration> configurations = root.query(query);
+        assertTrue(configurations.size() == 1);
     }
 
     @Test
-    public void should_return_two_recipients_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(700000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
-        Set<String> recipients = root.query(query);
-        assertTrue(recipients.size() == 2);
+    public void should_return_two_recipients_configs_given_budget() {
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(700000), PropertyType.APPARTMENT,
+                TransactionType.BUY, null, null));
+        Set<SlackRecipientsConfiguration> configurations = root.query(query);
+        assertTrue(configurations.size() == 2);
     }
 
     @Test
-    public void should_return_three_recipients_given_budget() {
-        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(900000), PropertyType.APPARTMENT, TransactionType.BUY, null, null));
-        Set<String> recipients = root.query(query);
-        assertTrue(recipients.size() == 3);
+    public void should_return_three_recipients_configs_given_budget() {
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(900000), PropertyType.APPARTMENT,
+                TransactionType.BUY, null, null));
+        Set<SlackRecipientsConfiguration> configurations = root.query(query);
+        assertTrue(configurations.size() == 3);
     }
 
     @Test
-    public void should_return_three_recipients_given_property_type() {
-        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(900000), PropertyType.HOUSE, TransactionType.BUY, null, null));
-        Set<String> recipients = root.query(query);
-        assertTrue(recipients.size() == 3);
+    public void should_return_three_recipients_configs_given_property_type() {
+        TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(900000), PropertyType.HOUSE,
+                TransactionType.BUY, null, null));
+        Set<SlackRecipientsConfiguration> configurations = root.query(query);
+        assertTrue(configurations.size() == 3);
     }
 
     private TrieTreeQueryNode getQuery(Property property) {
