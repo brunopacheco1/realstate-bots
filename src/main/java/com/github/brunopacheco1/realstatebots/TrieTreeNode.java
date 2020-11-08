@@ -1,12 +1,16 @@
 package com.github.brunopacheco1.realstatebots;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-import com.github.brunopacheco1.realstatebots.TrieTreeQueryNode.Operation;
+import java.util.logging.Level;
 
+import com.github.brunopacheco1.realstatebots.TrieTreeQueryNode.Operation;
+import lombok.extern.java.Log;
+
+@Log
 public class TrieTreeNode {
 
     private final Object key;
@@ -25,36 +29,33 @@ public class TrieTreeNode {
     }
 
     public void insert(TrieTreeNode newNode) {
-        if (newNode.key == null && defaultPath != null) {
-            defaultPath.recipients.addAll(newNode.recipients);
-            for (TrieTreeNode newNodeChild : newNode.children.values()) {
-                defaultPath.insert(newNodeChild);
-                for (TrieTreeNode child : children.values()) {
-                    child.insert(newNodeChild);
-                }
-            }
-        } else if (newNode.key == null && defaultPath == null) {
-            defaultPath = newNode;
-            for (TrieTreeNode newNodeChild : newNode.children.values()) {
-                for (TrieTreeNode child : children.values()) {
-                    child.insert(newNodeChild);
-                }
+        List<TrieTreeNode> toReceiveChildren = new ArrayList<>();
+
+        if (newNode.key == null) {
+            if (defaultPath == null) {
+                defaultPath = newNode;
+            } else {
+                toReceiveChildren.add(defaultPath);
             }
         } else if (children.containsKey(newNode.key)) {
-            TrieTreeNode existingChild = children.get(newNode.key);
-            existingChild.recipients.addAll(newNode.recipients);
-            for (TrieTreeNode newNodeChild : newNode.children.values()) {
-                existingChild.insert(newNodeChild);
-                if (defaultPath != null) {
-                    defaultPath.insert(newNodeChild);
-                }
+            if (defaultPath != null) {
+                toReceiveChildren.add(defaultPath);
             }
+            toReceiveChildren.add(children.get(newNode.key));
         } else {
             children.put(newNode.key, newNode);
+            if (defaultPath != null) {
+                toReceiveChildren.add(defaultPath);
+            }
+        }
+
+        for (TrieTreeNode nodeChild : toReceiveChildren) {
+            nodeChild.recipients.addAll(newNode.recipients);
+            if (newNode.defaultPath != null) {
+                nodeChild.insert(newNode.defaultPath);
+            }
             for (TrieTreeNode newNodeChild : newNode.children.values()) {
-                if (defaultPath != null) {
-                    defaultPath.insert(newNodeChild);
-                }
+                nodeChild.insert(newNodeChild);
             }
         }
     }
@@ -64,39 +65,32 @@ public class TrieTreeNode {
             return recipients;
         }
 
-        if (queryNode.getValue() == null) {
-            if (defaultPath == null) {
-                return Collections.emptySet();
-            }
-
-            return defaultPath.query(queryNode.getNext());
-        }
-
-        Collection<TrieTreeNode> childrenToCheck;
+        List<TrieTreeNode> nodesToCheck = new ArrayList<>();
         if (queryNode.getOperation() == Operation.EQUALS) {
             TrieTreeNode child = children.get(queryNode.getValue());
-
-            if (child == null) {
-                return Collections.emptySet();
+            if (child != null) {
+                nodesToCheck.add(child);
             }
-
-            childrenToCheck = Collections.singleton(child);
         } else if (queryNode.getOperation() == Operation.LESSER) {
             try {
-                childrenToCheck = children.headMap(key, true).values();
+                nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
             } catch (IllegalArgumentException e) {
-                childrenToCheck = Collections.emptyList();
+                log.log(Level.WARNING, e.getMessage(), e);
             }
         } else {
             try {
-                childrenToCheck = children.tailMap(key, true).values();
+                nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
             } catch (IllegalArgumentException e) {
-                childrenToCheck = Collections.emptyList();
+                log.log(Level.WARNING, e.getMessage(), e);
             }
         }
 
+        if (defaultPath != null) {
+            nodesToCheck.add(defaultPath);
+        }
+
         Set<String> flatMappedRecipients = new HashSet<>();
-        for (TrieTreeNode childToCheck : childrenToCheck) {
+        for (TrieTreeNode childToCheck : nodesToCheck) {
             flatMappedRecipients.addAll(childToCheck.query(queryNode.getNext()));
         }
 
