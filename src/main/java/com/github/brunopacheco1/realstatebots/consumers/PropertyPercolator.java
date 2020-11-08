@@ -4,21 +4,28 @@ import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import com.github.brunopacheco1.realstatebots.consumers.TrieTreeQueryNode.Operation;
 import com.github.brunopacheco1.realstatebots.domain.Filter;
 import com.github.brunopacheco1.realstatebots.domain.Notification;
 import com.github.brunopacheco1.realstatebots.domain.Property;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import io.smallrye.reactive.messaging.annotations.Broadcast;
-import lombok.extern.java.Log;
 
 @ApplicationScoped
-@Log
 public class PropertyPercolator {
 
+    @Inject
+    @Channel(PubSubConstants.SENDING_NOTIFICATION)
+    Emitter<Notification> notificationEmitter;
+
     private TrieTreeNode root = new TrieTreeNode(null);
+
+    // TODO - Load all filters on boot time
 
     @Incoming(PubSubConstants.UPDATING_PERCOLATOR)
     public CompletionStage<Void> addFilter(Message<Filter> message) {
@@ -36,15 +43,17 @@ public class PropertyPercolator {
     }
 
     @Incoming(PubSubConstants.PERCOLATING_PROPERTY)
-    @Outgoing(PubSubConstants.SENDING_NOTIFICATION)
-    @Broadcast
-    public Notification percolate(Message<Property> message) {
+    public CompletionStage<Void> percolate(Message<Property> message) {
         Property property = message.getPayload();
         TrieTreeQueryNode query = getQuery(property);
         Set<String> recipients = root.query(query);
-        log.info(String.join(", ", recipients));
-        String body = property.getUrl();
-        return new Notification(recipients, body);
+
+        if (!recipients.isEmpty()) {
+            String body = property.getUrl();
+            Notification notification = new Notification(recipients, body);
+            notificationEmitter.send(notification);
+        }
+        return message.ack();
     }
 
     private TrieTreeQueryNode getQuery(Property property) {

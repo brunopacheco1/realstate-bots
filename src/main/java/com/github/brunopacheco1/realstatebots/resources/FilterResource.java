@@ -1,7 +1,5 @@
 package com.github.brunopacheco1.realstatebots.resources;
 
-import java.util.concurrent.CompletionStage;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -18,11 +16,11 @@ public class FilterResource {
 
     @Inject
     @Channel("incoming-filter")
-    private Emitter<Filter> filterEmitter;
+    Emitter<Filter> filterEmitter;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public CompletionStage<Void> addFilter(Filter filter) {
-        return filterEmitter.send(filter);
+    public void addFilter(Filter filter) {
+        filterEmitter.send(filter);
     }
 }

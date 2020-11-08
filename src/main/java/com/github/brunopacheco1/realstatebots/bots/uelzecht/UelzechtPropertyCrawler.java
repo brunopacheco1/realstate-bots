@@ -20,7 +20,6 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import io.smallrye.reactive.messaging.annotations.Broadcast;
 import lombok.extern.java.Log;
 
 @ApplicationScoped

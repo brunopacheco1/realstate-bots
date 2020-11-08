@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import io.quarkus.mongodb.panache.MongoEntity;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @MongoEntity(collection="properties")
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Property extends PanacheMongoEntity {
     private final String location;
     private final BigDecimal value;

@@ -15,7 +15,8 @@ public class PropertyPersister {
     @Outgoing(PubSubConstants.PERCOLATING_PROPERTY)
     public Property persist(Message<Property> message) {
         Property property = message.getPayload();
-        log.info(property.toString());
+        property.persist();
+        // TODO - avoid duplicated entries
         return property;
     }
 }

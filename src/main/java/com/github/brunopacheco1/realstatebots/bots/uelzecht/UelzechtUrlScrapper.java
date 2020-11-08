@@ -25,7 +25,8 @@ import lombok.extern.java.Log;
 public class UelzechtUrlScrapper {
 
     @Inject
-    @Channel(PubSubConstants.UELZECHT_CRAWLER) Emitter<String> urlEmitter;
+    @Channel(PubSubConstants.UELZECHT_CRAWLER)
+    Emitter<String> urlEmitter;
 
     @Scheduled(cron = "{scheduler.uelzecht}")
     public void produces() {
@@ -33,7 +34,6 @@ public class UelzechtUrlScrapper {
             int page = 1;
             Integer pages = null;
             while (true) {
-                log.info(String.valueOf(page));
                 if (pages != null && page > pages) {
                     break;
                 }

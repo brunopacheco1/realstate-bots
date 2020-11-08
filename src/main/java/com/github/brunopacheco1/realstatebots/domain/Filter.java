@@ -6,9 +6,11 @@ import java.util.Set;
 import io.quarkus.mongodb.panache.MongoEntity;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @MongoEntity(collection="filters")
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Filter extends PanacheMongoEntity {
     private final BigDecimal budget;
     private final PropertyType propertyType;

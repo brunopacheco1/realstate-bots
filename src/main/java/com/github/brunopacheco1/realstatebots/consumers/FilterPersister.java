@@ -17,7 +17,7 @@ public class FilterPersister {
     @Broadcast
     public Filter persist(Message<Filter> message) {
         Filter filter = message.getPayload();
-        log.info(filter.toString());
+        filter.persist();
         return filter;
     }
 }
