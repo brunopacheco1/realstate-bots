@@ -1,8 +1,11 @@
-package com.github.brunopacheco1.realstatebots.uelzecht;
+package com.github.brunopacheco1.realstatebots.bots.uelzecht;
 
 import java.util.logging.Level;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import com.github.brunopacheco1.realstatebots.consumers.PubSubConstants;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -22,7 +25,7 @@ import lombok.extern.java.Log;
 public class UelzechtUrlScrapper {
 
     @Inject
-    @Channel("uelzecht-crawler") Emitter<String> urlEmitter;
+    @Channel(PubSubConstants.UELZECHT_CRAWLER) Emitter<String> urlEmitter;
 
     @Scheduled(cron = "{scheduler.uelzecht}")
     public void produces() {

@@ -1,4 +1,4 @@
-package com.github.brunopacheco1.realstatebots;
+package com.github.brunopacheco1.realstatebots.consumers;
 
 import java.util.concurrent.CompletionStage;
 import javax.enterprise.context.ApplicationScoped;
@@ -10,8 +10,8 @@ import lombok.extern.java.Log;
 @ApplicationScoped
 @Log
 public class NotificationSender {
-    
-    @Incoming("notification")
+
+    @Incoming(PubSubConstants.SENDING_NOTIFICATION)
     public CompletionStage<Void> percolate(Message<Notification> message) {
         Notification notification = message.getPayload();
         log.info(notification.toString());

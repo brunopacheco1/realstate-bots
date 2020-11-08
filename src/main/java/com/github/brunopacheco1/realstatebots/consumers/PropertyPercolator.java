@@ -1,10 +1,10 @@
-package com.github.brunopacheco1.realstatebots;
+package com.github.brunopacheco1.realstatebots.consumers;
 
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
-import com.github.brunopacheco1.realstatebots.TrieTreeQueryNode.Operation;
+import com.github.brunopacheco1.realstatebots.consumers.TrieTreeQueryNode.Operation;
 import com.github.brunopacheco1.realstatebots.domain.Filter;
 import com.github.brunopacheco1.realstatebots.domain.Notification;
 import com.github.brunopacheco1.realstatebots.domain.Property;
@@ -20,7 +20,7 @@ public class PropertyPercolator {
 
     private TrieTreeNode root = new TrieTreeNode(null);
 
-    @Incoming("incoming-filter")
+    @Incoming(PubSubConstants.UPDATING_PERCOLATOR)
     public CompletionStage<Void> addFilter(Message<Filter> message) {
         Filter filter = message.getPayload();
 
@@ -35,8 +35,8 @@ public class PropertyPercolator {
         return message.ack();
     }
 
-    @Incoming("incoming-property")
-    @Outgoing("notification")
+    @Incoming(PubSubConstants.PERCOLATING_PROPERTY)
+    @Outgoing(PubSubConstants.SENDING_NOTIFICATION)
     @Broadcast
     public Notification percolate(Message<Property> message) {
         Property property = message.getPayload();

@@ -1,8 +1,10 @@
-package com.github.brunopacheco1.realstatebots.uelzecht;
+package com.github.brunopacheco1.realstatebots.bots.uelzecht;
 
 import java.math.BigDecimal;
 import java.util.logging.Level;
 import javax.enterprise.context.ApplicationScoped;
+
+import com.github.brunopacheco1.realstatebots.consumers.PubSubConstants;
 import com.github.brunopacheco1.realstatebots.domain.Property;
 import com.github.brunopacheco1.realstatebots.domain.PropertyType;
 import com.github.brunopacheco1.realstatebots.domain.Source;
@@ -25,9 +27,8 @@ import lombok.extern.java.Log;
 @Log
 public class UelzechtPropertyCrawler {
 
-    @Incoming("uelzecht-crawler")
-    @Outgoing("incoming-property")
-    @Broadcast
+    @Incoming(PubSubConstants.UELZECHT_CRAWLER)
+    @Outgoing(PubSubConstants.INCOMING_PROPERTY)
     public Property crawl(Message<String> message) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String url = message.getPayload();

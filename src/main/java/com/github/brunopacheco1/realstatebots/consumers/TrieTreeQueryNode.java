@@ -1,4 +1,4 @@
-package com.github.brunopacheco1.realstatebots;
+package com.github.brunopacheco1.realstatebots.consumers;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.github.brunopacheco1.realstatebots;
+package com.github.brunopacheco1.realstatebots.consumers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import com.github.brunopacheco1.realstatebots.TrieTreeQueryNode.Operation;
+import com.github.brunopacheco1.realstatebots.consumers.TrieTreeQueryNode.Operation;
 import lombok.extern.java.Log;
 
 @Log

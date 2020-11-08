@@ -1,10 +1,10 @@
-package com.github.brunopacheco1.realstatebots;
+package com.github.brunopacheco1.realstatebots.consumers;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Set;
-import com.github.brunopacheco1.realstatebots.TrieTreeQueryNode.Operation;
+import com.github.brunopacheco1.realstatebots.consumers.TrieTreeQueryNode.Operation;
 import com.github.brunopacheco1.realstatebots.domain.Filter;
 import com.github.brunopacheco1.realstatebots.domain.Property;
 import com.github.brunopacheco1.realstatebots.domain.PropertyType;
