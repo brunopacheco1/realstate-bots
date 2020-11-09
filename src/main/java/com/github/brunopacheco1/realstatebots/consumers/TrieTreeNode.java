@@ -73,13 +73,13 @@ public class TrieTreeNode {
             }
         } else if (queryNode.getOperation() == Operation.LESSER) {
             try {
-                nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
+                nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
             } catch (IllegalArgumentException e) {
                 log.log(Level.WARNING, e.getMessage(), e);
             }
         } else {
             try {
-                nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
+                nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
             } catch (IllegalArgumentException e) {
                 log.log(Level.WARNING, e.getMessage(), e);
             }
