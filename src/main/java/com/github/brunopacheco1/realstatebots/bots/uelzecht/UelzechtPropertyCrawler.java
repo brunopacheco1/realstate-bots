@@ -1,6 +1,7 @@
 package com.github.brunopacheco1.realstatebots.bots.uelzecht;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import javax.enterprise.context.ApplicationScoped;
 
@@ -47,7 +48,7 @@ public class UelzechtPropertyCrawler {
                 TransactionType transactionType = url.endsWith("vente") ? TransactionType.BUY : TransactionType.RENT;
                 Source source = Source.UELZECHT;
                 String id = DigestUtils.sha3_256Hex(url + source);
-                return new Property(id, location, value, propertyType, transactionType, url, source);
+                return new Property(id, location, value, propertyType, transactionType, url, source, LocalDateTime.now());
             }
             throw new Exception("Empty body");
         } catch (Exception e) {

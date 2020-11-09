@@ -7,5 +7,6 @@ public enum PropertyType {
     PROPERTY,
     PARKING,
     OFFICE,
-    COMMERCIAL_PREMISES;
+    COMMERCIAL_PREMISES,
+    NEW_PROPERTY;
 }

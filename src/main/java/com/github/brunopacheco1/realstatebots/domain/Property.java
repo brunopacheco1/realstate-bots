@@ -1,6 +1,7 @@
 package com.github.brunopacheco1.realstatebots.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
@@ -25,4 +26,5 @@ public class Property extends PanacheMongoEntityBase {
     private TransactionType transactionType;
     private String url;
     private Source source;
+    private LocalDateTime insertionDate;
 }
