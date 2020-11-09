@@ -74,7 +74,7 @@ public class PropertyPercolator {
     private TrieTreeQueryNode getQuery(Property property) {
         return TrieTreeQueryNode.builder().operation(Operation.EQUALS).value(property.getTransactionType())
                 .next(TrieTreeQueryNode.builder().operation(Operation.EQUALS).value(property.getPropertyType()).next(
-                        TrieTreeQueryNode.builder().operation(Operation.LESSER).value(property.getValue()).build())
+                        TrieTreeQueryNode.builder().operation(Operation.GREATER).value(property.getValue()).build())
                         .build())
                 .build();
     }

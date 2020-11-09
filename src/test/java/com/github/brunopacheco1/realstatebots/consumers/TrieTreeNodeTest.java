@@ -83,7 +83,7 @@ public class TrieTreeNodeTest {
                 return TrieTreeQueryNode.builder().operation(Operation.EQUALS).value(property.getTransactionType())
                                 .next(TrieTreeQueryNode.builder().operation(Operation.EQUALS)
                                                 .value(property.getPropertyType())
-                                                .next(TrieTreeQueryNode.builder().operation(Operation.LESSER)
+                                                .next(TrieTreeQueryNode.builder().operation(Operation.GREATER)
                                                                 .value(property.getValue()).build())
                                                 .build())
                                 .build();

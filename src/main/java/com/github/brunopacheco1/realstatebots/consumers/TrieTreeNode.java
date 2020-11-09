@@ -71,15 +71,15 @@ public class TrieTreeNode {
             if (child != null) {
                 nodesToCheck.add(child);
             }
-        } else if (queryNode.getOperation() == Operation.LESSER) {
+        } else if (queryNode.getOperation() == Operation.LESS) {
             try {
-                nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
+                nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
             } catch (IllegalArgumentException e) {
                 log.log(Level.WARNING, e.getMessage(), e);
             }
         } else {
             try {
-                nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
+                nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
             } catch (IllegalArgumentException e) {
                 log.log(Level.WARNING, e.getMessage(), e);
             }

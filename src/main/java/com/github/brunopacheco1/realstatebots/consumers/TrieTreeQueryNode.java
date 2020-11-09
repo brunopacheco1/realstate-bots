@@ -12,7 +12,7 @@ public class TrieTreeQueryNode {
     private TrieTreeQueryNode next;
 
     enum Operation {
-        LESSER,
+        LESS,
         EQUALS,
         GREATER
     }
