@@ -9,6 +9,8 @@ import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.webhook.Payload;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
+
+import io.smallrye.reactive.messaging.annotations.Merge;
 import lombok.extern.java.Log;
 
 @ApplicationScoped
@@ -16,6 +18,7 @@ import lombok.extern.java.Log;
 public class NotificationSender {
 
     @Incoming(PubSubConstants.SENDING_NOTIFICATION)
+    @Merge
     public CompletionStage<Void> percolate(Message<Notification> message) {
         Notification notification = message.getPayload();
         Payload payload = Payload.builder().text(notification.getUrl()).build();

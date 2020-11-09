@@ -10,6 +10,8 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 
+import io.smallrye.reactive.messaging.annotations.Merge;
+
 @ApplicationScoped
 public class PropertyPersister {
 
@@ -18,6 +20,7 @@ public class PropertyPersister {
     Emitter<Property> propertyEmitter;
 
     @Incoming(PubSubConstants.INCOMING_PROPERTY)
+    @Merge
     public CompletionStage<Void> persist(Message<Property> message) {
         Property property = message.getPayload();
         Optional<Property> exists = Property.findByIdOptional(property.getId());
