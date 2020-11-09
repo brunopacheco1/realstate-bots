@@ -16,16 +16,16 @@ public class TrieTreeNode {
     private final Object key;
     private final TreeMap<Object, TrieTreeNode> children = new TreeMap<>();
     private TrieTreeNode defaultPath;
-    private final Set<SlackRecipientsConfiguration> configurations;
+    private final Set<String> recipients;
 
     public TrieTreeNode(Object key) {
         this.key = key;
-        this.configurations = new HashSet<>();
+        this.recipients = new HashSet<>();
     }
 
-    public TrieTreeNode(Object key, Set<SlackRecipientsConfiguration> configurations) {
+    public TrieTreeNode(Object key, Set<String> recipients) {
         this.key = key;
-        this.configurations = configurations;
+        this.recipients = recipients;
     }
 
     public void insert(TrieTreeNode newNode) {
@@ -50,7 +50,7 @@ public class TrieTreeNode {
         }
 
         for (TrieTreeNode nodeChild : toReceiveChildren) {
-            nodeChild.configurations.addAll(newNode.configurations);
+            nodeChild.recipients.addAll(newNode.recipients);
             if (newNode.defaultPath != null) {
                 nodeChild.insert(newNode.defaultPath);
             }
@@ -60,9 +60,9 @@ public class TrieTreeNode {
         }
     }
 
-    public Set<SlackRecipientsConfiguration> query(TrieTreeQueryNode queryNode) {
+    public Set<String> query(TrieTreeQueryNode queryNode) {
         if (queryNode == null) {
-            return configurations;
+            return recipients;
         }
 
         List<TrieTreeNode> nodesToCheck = new ArrayList<>();
@@ -89,7 +89,7 @@ public class TrieTreeNode {
             nodesToCheck.add(defaultPath);
         }
 
-        Set<SlackRecipientsConfiguration> flatMappedRecipients = new HashSet<>();
+        Set<String> flatMappedRecipients = new HashSet<>();
         for (TrieTreeNode childToCheck : nodesToCheck) {
             flatMappedRecipients.addAll(childToCheck.query(queryNode.getNext()));
         }
