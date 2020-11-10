@@ -20,6 +20,7 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 
 import io.quarkus.mongodb.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import io.smallrye.reactive.messaging.annotations.Merge;
 
 @ApplicationScoped
 public class PropertiesFinder {
@@ -29,6 +30,7 @@ public class PropertiesFinder {
     Emitter<Notification> notificationEmitter;
 
     @Incoming(PubSubConstants.FINDING_PROPERTY)
+    @Merge
     public CompletionStage<Void> findProperties(Message<Filter> message) {
         Filter filter = message.getPayload();
         Pair<String, Map<String, Object>> query = getQuery(filter);

@@ -6,11 +6,13 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import io.smallrye.reactive.messaging.annotations.Broadcast;
+import io.smallrye.reactive.messaging.annotations.Merge;
 
 @ApplicationScoped
 public class FilterPersister {
 
     @Incoming(PubSubConstants.INCOMING_FILTER)
+    @Merge
     @Outgoing(PubSubConstants.UPDATING_PERCOLATOR)
     @Broadcast
     public Filter persist(Message<Filter> message) {

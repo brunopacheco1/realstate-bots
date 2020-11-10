@@ -2,6 +2,7 @@ package com.github.brunopacheco1.realstatebots.consumers;
 
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import com.github.brunopacheco1.realstatebots.domain.Property;
@@ -16,8 +17,8 @@ import io.smallrye.reactive.messaging.annotations.Merge;
 public class PropertyPersister {
 
     @Inject
-    @Channel(PubSubConstants.PERCOLATING_PROPERTY)
-    Emitter<Property> propertyEmitter;
+    @Channel(PubSubConstants.RUNNING_PERCOLATOR)
+    Emitter<Property> runningPercolatorEmitter;
 
     @Incoming(PubSubConstants.INCOMING_PROPERTY)
     @Merge
@@ -26,7 +27,7 @@ public class PropertyPersister {
         Optional<Property> exists = Property.findByIdOptional(property.getId());
         if (exists.isEmpty()) {
             property.persist();
-            propertyEmitter.send(property);
+            runningPercolatorEmitter.send(property);
         }
         return message.ack();
     }

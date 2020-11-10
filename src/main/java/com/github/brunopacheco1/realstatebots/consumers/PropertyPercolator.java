@@ -19,6 +19,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 
 import io.quarkus.runtime.Startup;
+import io.smallrye.reactive.messaging.annotations.Merge;
 import lombok.extern.java.Log;
 
 @Startup
@@ -42,6 +43,7 @@ public class PropertyPercolator {
     }
 
     @Incoming(PubSubConstants.UPDATING_PERCOLATOR)
+    @Merge
     public CompletionStage<Void> addFilter(Message<Filter> message) {
         Filter filter = message.getPayload();
         addFilter(filter);
@@ -58,7 +60,8 @@ public class PropertyPercolator {
         root.insert(transactionTypeNode);
     }
 
-    @Incoming(PubSubConstants.PERCOLATING_PROPERTY)
+    @Incoming(PubSubConstants.RUNNING_PERCOLATOR)
+    @Merge
     public CompletionStage<Void> percolate(Message<Property> message) {
         Property property = message.getPayload();
         TrieTreeQueryNode query = getQuery(property);
