@@ -7,7 +7,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
 import com.github.brunopacheco1.realstate.consumers.PubSubConstants;
-import com.github.brunopacheco1.realstate.domain.Property;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
@@ -16,11 +15,11 @@ public class PropertyApi {
 
     @Inject
     @Channel(PubSubConstants.INCOMING_PROPERTY)
-    Emitter<Property> incomingPropertyEmitter;
+    Emitter<PropertyDto> incomingPropertyEmitter;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void addProperty(Property property) {
-        incomingPropertyEmitter.send(property);
+    public void addProperty(PropertyDto propertyDto) {
+        incomingPropertyEmitter.send(propertyDto);
     }
 }

@@ -21,7 +21,7 @@ public class FilterApi {
 
     @Inject
     @Channel(PubSubConstants.INCOMING_FILTER)
-    Emitter<Filter> incomingFilterEmitter;
+    Emitter<FilterDto> incomingFilterEmitter;
 
     @Inject
     @Channel(PubSubConstants.FINDING_PROPERTY)
@@ -29,8 +29,8 @@ public class FilterApi {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void addFilter(Filter filter) {
-        incomingFilterEmitter.send(filter);
+    public void addFilter(FilterDto filterDto) {
+        incomingFilterEmitter.send(filterDto);
     }
 
     @POST
