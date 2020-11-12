@@ -25,7 +25,7 @@ import lombok.extern.java.Log;
 public class UelzechtUrlScrapper {
 
     @Inject
-    @Channel("uelzecht-crawler")
+    @Channel(PubSubConstants.UELZECHT_CRAWLER)
     Emitter<String> urlEmitter;
 
     @Scheduled(cron = "{scheduler.uelzecht}")
