@@ -39,10 +39,11 @@ public class AtHomeCrawler {
         log.info("Starting crawling.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             int page = 1;
-            Integer pages = null;
+            Integer existingPages = null;
+            Integer maxPages = 20;
             for (TransactionType transactionType : TransactionType.values()) {
                 while (true) {
-                    if (pages != null && page > pages) {
+                    if (existingPages != null && page > Math.min(maxPages, existingPages)) {
                         break;
                     }
                     String url = "https://www.athome.lu/en/srp/?tr=" + transactionType.name().toLowerCase()
@@ -53,9 +54,9 @@ public class AtHomeCrawler {
                     HttpEntity entity = response.getEntity();
                     if (entity != null) {
                         Document doc = Jsoup.parse(EntityUtils.toString(entity));
-                        if (pages == null) {
+                        if (existingPages == null) {
                             int total = getPages(doc.select("div.paginator > p").text());
-                            pages = total % 20 > 0 ? (total / 20) + 1 : (total / 20);
+                            existingPages = total % 20 > 0 ? (total / 20) + 1 : (total / 20);
                         }
 
                         Elements elements = doc.select("article");
