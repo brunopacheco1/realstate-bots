@@ -61,8 +61,7 @@ public class AtHomeCrawler {
 
                         Elements elements = doc.select("article");
                         elements.forEach(el -> {
-                            PropertyDto property = getProperty(el, transactionType);
-                            incomingPropertyEmitter.send(property);
+                            getProperty(el, transactionType);
                         });
                         page++;
                         continue;
@@ -76,14 +75,19 @@ public class AtHomeCrawler {
         log.info("Finished crawling.");
     }
 
-    private PropertyDto getProperty(Element el, TransactionType transactionType) {
-        String urlSuffix = el.select("link").attr("href");
-        String url = "https://www.athome.lu" + urlSuffix;
-        PropertyType propertyType = getPropertyType(urlSuffix);
-        String location = el.select("span[itemprop=addressLocality]").text().toUpperCase();
-        BigDecimal value = getPrice(el.select("ul.mainInfos > li.propertyPrice").text());
-        Source source = Source.ATHOME;
-        return new PropertyDto(location, value, propertyType, transactionType, url, source);
+    private void getProperty(Element el, TransactionType transactionType) {
+        try {
+            String urlSuffix = el.select("link").attr("href");
+            String url = "https://www.athome.lu" + urlSuffix;
+            PropertyType propertyType = getPropertyType(urlSuffix);
+            String location = el.select("span[itemprop=addressLocality]").text().toUpperCase();
+            BigDecimal value = getPrice(el.select("ul.mainInfos > li.propertyPrice").text());
+            Source source = Source.ATHOME;
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, url, source);
+            incomingPropertyEmitter.send(property);
+        } catch (Exception e) {
+            log.log(Level.WARNING, e.getMessage(), e);
+        }
     }
 
     private Integer getPages(String text) {

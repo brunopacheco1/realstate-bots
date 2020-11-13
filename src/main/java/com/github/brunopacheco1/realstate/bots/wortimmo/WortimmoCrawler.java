@@ -65,8 +65,7 @@ public class WortimmoCrawler {
 
                         Elements elements = doc.select("div.property-informations");
                         elements.forEach(el -> {
-                            PropertyDto property = getProperty(el, transactionType);
-                            incomingPropertyEmitter.send(property);
+                            getProperty(el, transactionType);
                         });
                         page++;
                         continue;
@@ -80,14 +79,19 @@ public class WortimmoCrawler {
         log.info("Finished crawling.");
     }
 
-    private PropertyDto getProperty(Element el, TransactionType transactionType) {
-        String urlSuffix = el.select("a").attr("href");
-        String url = "https://www.wortimmo.lu/en" + urlSuffix;
-        PropertyType propertyType = getPropertyType(urlSuffix);
-        String location = el.select("h2.c-title").text().split("(to sell in)|(to rent in)")[1].toUpperCase().trim();
-        BigDecimal value = getPrice(el.select("div.c-price").text());
-        Source source = Source.WORTIMMO;
-        return new PropertyDto(location, value, propertyType, transactionType, url, source);
+    private void getProperty(Element el, TransactionType transactionType) {
+        try {
+            String urlSuffix = el.select("a").attr("href");
+            String url = "https://www.wortimmo.lu/en" + urlSuffix;
+            PropertyType propertyType = getPropertyType(urlSuffix);
+            String location = el.select("h2.c-title").text().split("(to sell in)|(to rent in)")[1].toUpperCase().trim();
+            BigDecimal value = getPrice(el.select("div.c-price").text());
+            Source source = Source.WORTIMMO;
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, url, source);
+            incomingPropertyEmitter.send(property);
+        } catch (Exception e) {
+            log.log(Level.WARNING, e.getMessage(), e);
+        }
     }
 
     private Integer getPages(String text) {

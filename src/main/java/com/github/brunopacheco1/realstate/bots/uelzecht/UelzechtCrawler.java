@@ -58,8 +58,7 @@ public class UelzechtCrawler {
 
                     Elements properties = doc.select("div.content_annonce_bien");
                     properties.forEach(el -> {
-                        PropertyDto property = getProperty(el);
-                        incomingPropertyEmitter.send(property);
+                        getProperty(el);
                     });
                     page++;
                     continue;
@@ -72,15 +71,20 @@ public class UelzechtCrawler {
         log.info("Finished crawling.");
     }
 
-    private PropertyDto getProperty(Element el) {
-        String urlSuffix = el.select("div.image > a").attr("href").split("_")[0];
-        String propertyUrl = "https://www.uelzecht.lu/" + urlSuffix;
-        TransactionType transactionType = urlSuffix.endsWith("vente") ? TransactionType.BUY : TransactionType.RENT;
-        PropertyType propertyType = getPropertyType(el.select("span.nature_listing").text());
-        String location = el.select("span.ville_listing").text().toUpperCase();
-        BigDecimal value = getPrice(el.select("span.prix_listing").text());
-        Source source = Source.UELZECHT;
-        return new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source);
+    private void getProperty(Element el) {
+        try {
+            String urlSuffix = el.select("div.image > a").attr("href").split("_")[0];
+            String propertyUrl = "https://www.uelzecht.lu/" + urlSuffix;
+            TransactionType transactionType = urlSuffix.endsWith("vente") ? TransactionType.BUY : TransactionType.RENT;
+            PropertyType propertyType = getPropertyType(el.select("span.nature_listing").text());
+            String location = el.select("span.ville_listing").text().toUpperCase();
+            BigDecimal value = getPrice(el.select("span.prix_listing").text());
+            Source source = Source.UELZECHT;
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source);
+            incomingPropertyEmitter.send(property);
+        } catch (Exception e) {
+            log.log(Level.WARNING, e.getMessage(), e);
+        }
     }
 
     private BigDecimal getPrice(String value) {
@@ -107,7 +111,8 @@ public class UelzechtCrawler {
         if (cleanedValue.contains("bureau")) {
             return PropertyType.OFFICE;
         }
-        if (cleanedValue.contains("commercial") || cleanedValue.contains("restaurant") || cleanedValue.contains("commerce")) {
+        if (cleanedValue.contains("commercial") || cleanedValue.contains("restaurant")
+                || cleanedValue.contains("commerce")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
         log.info(cleanedValue);
