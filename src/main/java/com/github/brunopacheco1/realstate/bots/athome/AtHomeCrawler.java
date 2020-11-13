@@ -120,6 +120,7 @@ public class AtHomeCrawler {
         if(cleanedValue.contains("housing-project")) {
             return PropertyType.NEW_PROPERTY;
         }
+        log.info(cleanedValue);
         throw new RuntimeException("PropertyType not found");
     }
 }

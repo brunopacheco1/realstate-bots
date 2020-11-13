@@ -110,6 +110,7 @@ public class UelzechtCrawler {
         if (cleanedValue.contains("commercial") || cleanedValue.contains("restaurant") || cleanedValue.contains("commerce")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
+        log.info(cleanedValue);
         throw new RuntimeException("PropertyType not found");
     }
 }
