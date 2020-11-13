@@ -30,6 +30,7 @@ public class UelzechtUrlScrapper {
 
     @Scheduled(cron = "{scheduler.uelzecht}")
     public void produces() {
+        log.info("Starting url scrapping.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             int page = 1;
             Integer pages = null;
@@ -62,6 +63,6 @@ public class UelzechtUrlScrapper {
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
         }
-        log.info("Finished crawling.");
+        log.info("Finished url scrapping.");
     }
 }

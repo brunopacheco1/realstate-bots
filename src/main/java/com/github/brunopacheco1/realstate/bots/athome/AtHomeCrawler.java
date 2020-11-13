@@ -36,6 +36,7 @@ public class AtHomeCrawler {
 
     @Scheduled(cron = "{scheduler.athome}")
     public void produces() {
+        log.info("Starting crawling.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             int page = 1;
             Integer pages = null;
