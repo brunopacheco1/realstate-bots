@@ -42,7 +42,7 @@ public class WortimmoCrawler {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             int page = 1;
             Integer existingPages = null;
-            Integer maxPages = 5000; // TODO - Change it to a smaller number, when all properties are fetched.
+            Integer maxPages = 20;
             for (TransactionType transactionType : TransactionType.values()) {
                 while (true) {
                     if (existingPages != null && page > Math.min(maxPages, existingPages)) {
@@ -68,6 +68,7 @@ public class WortimmoCrawler {
                             getProperty(el, transactionType);
                         });
                         page++;
+                        Thread.sleep(1000);
                         continue;
                     }
                     break;
