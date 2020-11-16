@@ -64,6 +64,8 @@ public class AtHomeCrawler {
                             getProperty(el, transactionType);
                         });
                         page++;
+                        
+                        Thread.sleep(1000);
                         continue;
                     }
                     break;

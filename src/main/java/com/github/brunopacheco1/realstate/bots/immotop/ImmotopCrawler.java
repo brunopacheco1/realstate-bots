@@ -91,6 +91,7 @@ public class ImmotopCrawler {
                             getProperty(el, transactionType);
                         });
                         page++;
+                        Thread.sleep(1000);
                         continue;
                     }
                     break;

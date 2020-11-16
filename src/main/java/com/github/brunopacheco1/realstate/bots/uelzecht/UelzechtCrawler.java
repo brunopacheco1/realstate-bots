@@ -61,6 +61,8 @@ public class UelzechtCrawler {
                         getProperty(el);
                     });
                     page++;
+                    
+                    Thread.sleep(1000);
                     continue;
                 }
                 break;
