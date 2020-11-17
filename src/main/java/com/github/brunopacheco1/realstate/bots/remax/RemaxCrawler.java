@@ -63,6 +63,7 @@ public class RemaxCrawler {
                     break;
                 }
             }
+            driver.quit();
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
         }
