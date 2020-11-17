@@ -2,9 +2,7 @@ package com.github.brunopacheco1.realstate.bots.immotop;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -149,9 +147,6 @@ public class ImmotopCrawler {
         httpClient.execute(post);
     }
 
-    private Set<String> urls = new HashSet<>();
-    private List<String> urlsOrdered = new ArrayList<>();
-
     private void getProperty(Element el, TransactionType transactionType) {
         try {
             String propertyUrl = el.select("a").attr("href");
@@ -160,10 +155,6 @@ public class ImmotopCrawler {
             BigDecimal value = getPrice(el.select("div.price").text());
             Source source = Source.IMMOTOP;
             PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source);
-            if (!urls.contains(property.getUrl() + " - " + property.getTransactionType())) {
-                urls.add(property.getUrl() + " - " + property.getTransactionType());
-                urlsOrdered.add(property.getUrl() + " - " + property.getTransactionType());
-            }
             incomingPropertyEmitter.send(property);
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
@@ -215,6 +206,6 @@ public class ImmotopCrawler {
         if (cleanedValue.equals("ground")) {
             return PropertyType.LAND;
         }
-        throw new RuntimeException("PropertyType not found");
+        throw new RuntimeException("PropertyType not found - " + value);
     }
 }

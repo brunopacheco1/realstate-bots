@@ -136,7 +136,6 @@ public class WortimmoCrawler {
         if(cleanedValue.contains("shop") || cleanedValue.contains("business-takeover") || cleanedValue.contains("commercial-premises") || cleanedValue.contains("catering-hospitality")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
-        log.info(cleanedValue);
-        throw new RuntimeException("PropertyType not found");
+        throw new RuntimeException("PropertyType not found - " + value);
     }
 }

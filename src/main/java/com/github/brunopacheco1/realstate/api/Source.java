@@ -4,5 +4,6 @@ public enum Source {
     UELZECHT,
     ATHOME,
     WORTIMMO,
-    IMMOTOP;
+    IMMOTOP,
+    REMAX;
 }
