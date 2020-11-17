@@ -200,7 +200,7 @@ public class ImmotopCrawler {
         if (cleanedValue.equals("garage")) {
             return PropertyType.PARKING;
         }
-        if (cleanedValue.equals("commercial-property") || cleanedValue.equals("business")) {
+        if (cleanedValue.equals("industrial-property") || cleanedValue.equals("commercial-property") || cleanedValue.equals("business")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
         if (cleanedValue.equals("ground")) {
