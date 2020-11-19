@@ -50,7 +50,7 @@ public class TrieTreeNodeTest {
         }
 
         @Test
-        public void should_return_none_recipients_config_given_budget() {
+        public void should_return_none_recipient_given_budget() {
                 TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(1000000),
                                 PropertyType.APPARTMENT, TransactionType.BUY, null, null, 3, false, null));
                 Set<String> recipients = root.query(query);
@@ -58,7 +58,7 @@ public class TrieTreeNodeTest {
         }
 
         @Test
-        public void should_return_one_recipients_config_given_budget() {
+        public void should_return_one_recipient_given_budget() {
                 TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(800000),
                                 PropertyType.APPARTMENT, TransactionType.BUY, null, null, 3, false, null));
                 Set<String> recipients = root.query(query);
@@ -66,7 +66,7 @@ public class TrieTreeNodeTest {
         }
 
         @Test
-        public void should_return_two_recipients_configs_given_budget() {
+        public void should_return_two_recipients_given_budget() {
                 TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(700000),
                                 PropertyType.APPARTMENT, TransactionType.BUY, null, null, 3, false, null));
                 Set<String> recipients = root.query(query);
@@ -74,7 +74,7 @@ public class TrieTreeNodeTest {
         }
 
         @Test
-        public void should_return_three_recipients_configs_given_budget() {
+        public void should_return_three_recipients_given_budget() {
                 TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(600000),
                                 PropertyType.APPARTMENT, TransactionType.BUY, null, null, 3, false, null));
                 Set<String> recipients = root.query(query);
@@ -82,7 +82,7 @@ public class TrieTreeNodeTest {
         }
 
         @Test
-        public void should_return_three_recipients_configs_given_property_type() {
+        public void should_return_three_recipients_given_property_type() {
                 TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(600000),
                                 PropertyType.HOUSE, TransactionType.BUY, null, null, 3, false, null));
                 Set<String> recipients = root.query(query);
@@ -90,11 +90,11 @@ public class TrieTreeNodeTest {
         }
 
         @Test
-        public void should_return_one_recipient_configs_given_number_of_bedrooms() {
+        public void should_return_two_recipients_given_number_of_bedrooms() {
                 TrieTreeQueryNode query = getQuery(new Property(null, null, BigDecimal.valueOf(600000),
                                 PropertyType.HOUSE, TransactionType.BUY, null, null, 2, true, null));
                 Set<String> recipients = root.query(query);
-                assertTrue(recipients.size() == 1);
+                assertTrue(recipients.size() == 2);
         }
 
         @Test
