@@ -154,8 +154,8 @@ public class ImmotopCrawler {
             String location = getLocation(el.select("a").text());
             BigDecimal value = getPrice(el.select("div.price").text());
             Source source = Source.IMMOTOP;
-            int numberOfBedrooms = getNumberOfBedrooms(el.select("div[title='Rooms']:has(i.fa-bed)").text());
-            boolean hasGarage = !el.select("div[title='Garages']:has(i.fa-car)").isEmpty();
+            Integer numberOfBedrooms = getNumberOfBedrooms(el.select("div[title='Rooms']:has(i.fa-bed)").text());
+            Boolean hasGarage = !el.select("div[title='Garages']:has(i.fa-car)").isEmpty();
             PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
                     numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
@@ -177,7 +177,7 @@ public class ImmotopCrawler {
 
     private Integer getNumberOfBedrooms(String value) {
         String cleanedValue = value.replaceAll("\\D", "");
-        if(cleanedValue.isEmpty()) {
+        if (cleanedValue.isEmpty()) {
             return null;
         }
         return Integer.parseInt(cleanedValue);

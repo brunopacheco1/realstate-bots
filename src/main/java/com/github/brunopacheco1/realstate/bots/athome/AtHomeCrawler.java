@@ -34,7 +34,7 @@ public class AtHomeCrawler {
     @Channel(PubSubConstants.INCOMING_PROPERTY)
     Emitter<PropertyDto> incomingPropertyEmitter;
 
-    @Scheduled(every = "30m")
+    @Scheduled(cron = "{scheduler.athome}")
     public void produces() {
         log.info("Starting crawling.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -85,8 +85,8 @@ public class AtHomeCrawler {
             String location = el.select("span[itemprop=addressLocality]").text().toUpperCase();
             BigDecimal value = getPrice(el.select("ul.mainInfos > li.propertyPrice").text());
             Source source = Source.ATHOME;
-            int numberOfBedrooms = getNumberOfBedrooms(el.select("ul.characterstics > li:has(i.icon-bed)").text());
-            boolean hasGarage = !el.select("ul.characterstics > li:has(i.icon-car)").isEmpty();
+            Integer numberOfBedrooms = getNumberOfBedrooms(el.select("ul.characterstics > li:has(i.icon-bed)").text());
+            Boolean hasGarage = !el.select("ul.characterstics > li:has(i.icon-car)").isEmpty();
             PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
                     numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
@@ -101,7 +101,7 @@ public class AtHomeCrawler {
 
     private Integer getNumberOfBedrooms(String value) {
         String cleanedValue = value.replaceAll("\\D", "");
-        if(cleanedValue.isEmpty()) {
+        if (cleanedValue.isEmpty()) {
             return null;
         }
         return Integer.parseInt(cleanedValue);
