@@ -66,22 +66,25 @@ public class TrieTreeNode {
         }
 
         List<TrieTreeNode> nodesToCheck = new ArrayList<>();
-        if (queryNode.getOperation() == Operation.EQUALS) {
-            TrieTreeNode child = children.get(queryNode.getValue());
-            if (child != null) {
-                nodesToCheck.add(child);
-            }
-        } else if (queryNode.getOperation() == Operation.LESS) {
-            try {
-                nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
-            } catch (IllegalArgumentException e) {
-                log.log(Level.WARNING, e.getMessage(), e);
-            }
-        } else {
-            try {
-                nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
-            } catch (IllegalArgumentException e) {
-                log.log(Level.WARNING, e.getMessage(), e);
+        
+        if (queryNode.getValue() != null) {
+            if (queryNode.getOperation() == Operation.EQUALS) {
+                TrieTreeNode child = children.get(queryNode.getValue());
+                if (child != null) {
+                    nodesToCheck.add(child);
+                }
+            } else if (queryNode.getOperation() == Operation.LESS) {
+                try {
+                    nodesToCheck.addAll(children.headMap(queryNode.getValue(), true).values());
+                } catch (IllegalArgumentException e) {
+                    log.log(Level.WARNING, e.getMessage(), e);
+                }
+            } else {
+                try {
+                    nodesToCheck.addAll(children.tailMap(queryNode.getValue(), true).values());
+                } catch (IllegalArgumentException e) {
+                    log.log(Level.WARNING, e.getMessage(), e);
+                }
             }
         }
 

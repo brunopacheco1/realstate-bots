@@ -34,7 +34,7 @@ public class AtHomeCrawler {
     @Channel(PubSubConstants.INCOMING_PROPERTY)
     Emitter<PropertyDto> incomingPropertyEmitter;
 
-    @Scheduled(cron = "{scheduler.athome}")
+    @Scheduled(every = "30m")
     public void produces() {
         log.info("Starting crawling.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -64,7 +64,7 @@ public class AtHomeCrawler {
                             getProperty(el, transactionType);
                         });
                         page++;
-                        
+
                         Thread.sleep(1000);
                         continue;
                     }
@@ -80,12 +80,15 @@ public class AtHomeCrawler {
     private void getProperty(Element el, TransactionType transactionType) {
         try {
             String urlSuffix = el.select("link").attr("href");
-            String url = "https://www.athome.lu" + urlSuffix;
+            String propertyUrl = "https://www.athome.lu" + urlSuffix;
             PropertyType propertyType = getPropertyType(urlSuffix);
             String location = el.select("span[itemprop=addressLocality]").text().toUpperCase();
             BigDecimal value = getPrice(el.select("ul.mainInfos > li.propertyPrice").text());
             Source source = Source.ATHOME;
-            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, url, source);
+            int numberOfBedrooms = getNumberOfBedrooms(el.select("ul.characterstics > li:has(i.icon-bed)").text());
+            boolean hasGarage = !el.select("ul.characterstics > li:has(i.icon-car)").isEmpty();
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
+                    numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
@@ -94,6 +97,14 @@ public class AtHomeCrawler {
 
     private Integer getPages(String text) {
         return Integer.parseInt(text.split("of")[1].replaceAll("\\D", ""));
+    }
+
+    private Integer getNumberOfBedrooms(String value) {
+        String cleanedValue = value.replaceAll("\\D", "");
+        if(cleanedValue.isEmpty()) {
+            return null;
+        }
+        return Integer.parseInt(cleanedValue);
     }
 
     private BigDecimal getPrice(String value) {
@@ -120,10 +131,10 @@ public class AtHomeCrawler {
         if (cleanedValue.contains("build")) {
             return PropertyType.PROPERTY;
         }
-        if(cleanedValue.contains("commercial-property")) {
+        if (cleanedValue.contains("commercial-property")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
-        if(cleanedValue.contains("housing-project")) {
+        if (cleanedValue.contains("housing-project")) {
             return PropertyType.NEW_PROPERTY;
         }
         throw new RuntimeException("PropertyType not found - " + value);

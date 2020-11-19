@@ -1,19 +1,25 @@
 package com.github.brunopacheco1.realstate.consumers;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class TrieTreeQueryNode {
-    
-    private Object value;
-    private Operation operation;
+
+    private final Object value;
+    private final Operation operation;
     private TrieTreeQueryNode next;
 
+    public TrieTreeQueryNode(Object value, Operation operation) {
+        this.value = value;
+        this.operation = operation;
+    }
+
+    public TrieTreeQueryNode next(TrieTreeQueryNode node) {
+        this.next = node;
+        return node;
+    }
+
     enum Operation {
-        LESS,
-        EQUALS,
-        GREATER
+        LESS, EQUALS, GREATER
     }
 }

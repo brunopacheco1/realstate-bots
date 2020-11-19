@@ -52,10 +52,14 @@ public class PropertyPercolator {
     }
 
     private void addFilter(Filter filter) {
-        TrieTreeNode budgetNode = new TrieTreeNode(filter.getBudget(), filter.getRecipients());
+        TrieTreeNode hasGarageNode = new TrieTreeNode(filter.getHasGarage(), filter.getRecipients());
+        TrieTreeNode numberOfBedroomsNode = new TrieTreeNode(filter.getNumberOfBedrooms());
+        TrieTreeNode budgetNode = new TrieTreeNode(filter.getBudget());
         TrieTreeNode propertyTypeNode = new TrieTreeNode(filter.getPropertyType());
         TrieTreeNode transactionTypeNode = new TrieTreeNode(filter.getTransactionType());
 
+        numberOfBedroomsNode.insert(hasGarageNode);
+        budgetNode.insert(numberOfBedroomsNode);
         propertyTypeNode.insert(budgetNode);
         transactionTypeNode.insert(propertyTypeNode);
         root.insert(transactionTypeNode);
@@ -76,10 +80,14 @@ public class PropertyPercolator {
     }
 
     private TrieTreeQueryNode getQuery(Property property) {
-        return TrieTreeQueryNode.builder().operation(Operation.EQUALS).value(property.getTransactionType())
-                .next(TrieTreeQueryNode.builder().operation(Operation.EQUALS).value(property.getPropertyType()).next(
-                        TrieTreeQueryNode.builder().operation(Operation.GREATER).value(property.getValue()).build())
-                        .build())
-                .build();
+        TrieTreeQueryNode hasGarageNode = new TrieTreeQueryNode(property.getHasGarage(), Operation.EQUALS);
+        TrieTreeQueryNode numberOfBedroomsNode = new TrieTreeQueryNode(property.getNumberOfBedrooms(), Operation.LESS);
+        TrieTreeQueryNode valueNode = new TrieTreeQueryNode(property.getValue(), Operation.GREATER);
+        TrieTreeQueryNode propertyTypeNode = new TrieTreeQueryNode(property.getPropertyType(), Operation.EQUALS);
+        TrieTreeQueryNode transactionTypeNode = new TrieTreeQueryNode(property.getTransactionType(), Operation.EQUALS);
+
+        transactionTypeNode.next(propertyTypeNode).next(valueNode).next(numberOfBedroomsNode).next(hasGarageNode);
+
+        return transactionTypeNode;
     }
 }

@@ -18,4 +18,6 @@ public class PropertyDto {
     private TransactionType transactionType;
     private String url;
     private Source source;
+    private Integer numberOfBedrooms;
+    private Boolean hasGarage;
 }

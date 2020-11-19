@@ -17,4 +17,6 @@ public class FilterDto {
     private PropertyType propertyType;
     private TransactionType transactionType;
     private Set<String> recipients;
+    private Integer numberOfBedrooms;
+    private Boolean hasGarage;
 }

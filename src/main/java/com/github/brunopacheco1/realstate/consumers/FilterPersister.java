@@ -21,7 +21,7 @@ public class FilterPersister {
     public Filter persist(Message<FilterDto> message) {
         FilterDto filterDto = message.getPayload();
         Filter filter = new Filter(filterDto.getBudget(), filterDto.getPropertyType(), filterDto.getTransactionType(),
-                filterDto.getRecipients());
+                filterDto.getRecipients(), filterDto.getNumberOfBedrooms(), filterDto.getHasGarage());
         filter.persist();
         return filter;
     }

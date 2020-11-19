@@ -35,7 +35,7 @@ public class PropertyPersister {
 
         Property property = new Property(id, propertyDto.getLocation(), propertyDto.getValue(),
                 propertyDto.getPropertyType(), propertyDto.getTransactionType(), propertyDto.getUrl(),
-                propertyDto.getSource(), insertionDate);
+                propertyDto.getSource(), propertyDto.getNumberOfBedrooms(), propertyDto.getHasGarage(), insertionDate);
 
         Optional<Property> exists = Property.findByIdOptional(property.getId());
         if (exists.isEmpty()) {

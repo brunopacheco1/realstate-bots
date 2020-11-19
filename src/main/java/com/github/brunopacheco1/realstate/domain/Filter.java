@@ -21,4 +21,6 @@ public class Filter extends PanacheMongoEntity {
     private PropertyType propertyType;
     private TransactionType transactionType;
     private Set<String> recipients;
+    private Integer numberOfBedrooms;
+    private Boolean hasGarage;
 }

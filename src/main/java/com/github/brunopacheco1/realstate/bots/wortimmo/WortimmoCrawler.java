@@ -83,12 +83,15 @@ public class WortimmoCrawler {
     private void getProperty(Element el, TransactionType transactionType) {
         try {
             String urlSuffix = el.select("a").attr("href");
-            String url = "https://www.wortimmo.lu/en" + urlSuffix;
+            String propertyUrl = "https://www.wortimmo.lu/en" + urlSuffix;
             PropertyType propertyType = getPropertyType(urlSuffix);
             String location = el.select("h2.c-title").text().split("(to sell in)|(to rent in)")[1].toUpperCase().trim();
             BigDecimal value = getPrice(el.select("div.c-price").text());
             Source source = Source.WORTIMMO;
-            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, url, source);
+            Integer numberOfBedrooms = getNumberOfBedrooms(el.select("div.c-main-caracteristics--bedroom").text());
+            Boolean hasGarage = !el.select("div.c-main-caracteristics--parking").text().equals("-");
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
+                    numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
@@ -97,6 +100,14 @@ public class WortimmoCrawler {
 
     private Integer getPages(String text) {
         return Integer.parseInt(text.replaceAll("\\D", ""));
+    }
+
+    private Integer getNumberOfBedrooms(String value) {
+        String cleanedValue = value.replaceAll("\\D", "");
+        if(cleanedValue.isEmpty()) {
+            return null;
+        }
+        return Integer.parseInt(cleanedValue);
     }
 
     private BigDecimal getPrice(String value) {
@@ -118,7 +129,7 @@ public class WortimmoCrawler {
         if (cleanedValue.contains("office")) {
             return PropertyType.OFFICE;
         }
-        if (cleanedValue.contains("house-semi-detached") || cleanedValue.contains("joint-house") || cleanedValue.contains("investment-house") || cleanedValue.contains("house") || cleanedValue.contains("detached-house") || cleanedValue.contains("villa")) {
+        if (cleanedValue.contains("house-semi-detached") || cleanedValue.contains("cottage") || cleanedValue.contains("joint-house") || cleanedValue.contains("investment-house") || cleanedValue.contains("house") || cleanedValue.contains("detached-house") || cleanedValue.contains("villa")) {
             return PropertyType.HOUSE;
         }
         if (cleanedValue.contains("parking") || cleanedValue.contains("garage")) {

@@ -106,12 +106,15 @@ public class RemaxCrawler {
     private void getProperty(Element el, TransactionType transactionType) {
         try {
             String propertyUrlSuffix = el.select("a.proplist_price").attr("href");
-            String url = "https://www.remax.lu" + propertyUrlSuffix;
+            String propertyUrl = "https://www.remax.lu" + propertyUrlSuffix;
             PropertyType propertyType = getPropertyType(el.select("div.gallery-transtype").text());
             String location = getLocation(el.select("div.gallery-title > a").text());
             BigDecimal value = getPrice(el.select("a.proplist_price").text());
             Source source = Source.REMAX;
-            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, url, source);
+            Integer numberOfBedrooms = getNumberOfBedrooms(el.select("img[data-original-title^='Num. of Bedrooms']").attr("data-original-title"));
+            Boolean hasGarage = null;
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
+                    numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
@@ -125,6 +128,14 @@ public class RemaxCrawler {
             cleanedValue = parts[1].trim() + "-" + parts[0].trim();
         }
         return cleanedValue;
+    }
+
+    private Integer getNumberOfBedrooms(String value) {
+        String cleanedValue = value.replaceAll("\\D", "");
+        if(cleanedValue.isEmpty()) {
+            return null;
+        }
+        return Integer.parseInt(cleanedValue);
     }
 
     private BigDecimal getPrice(String value) {

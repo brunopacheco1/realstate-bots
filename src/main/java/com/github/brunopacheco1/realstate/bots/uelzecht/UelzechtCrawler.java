@@ -82,7 +82,10 @@ public class UelzechtCrawler {
             String location = el.select("span.ville_listing").text().toUpperCase();
             BigDecimal value = getPrice(el.select("span.prix_listing").text());
             Source source = Source.UELZECHT;
-            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source);
+            Integer numberOfBedrooms = null;
+            Boolean hasGarage = null;
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
+                    numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);

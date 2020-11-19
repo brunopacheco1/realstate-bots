@@ -154,7 +154,10 @@ public class ImmotopCrawler {
             String location = getLocation(el.select("a").text());
             BigDecimal value = getPrice(el.select("div.price").text());
             Source source = Source.IMMOTOP;
-            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source);
+            int numberOfBedrooms = getNumberOfBedrooms(el.select("div[title='Rooms']:has(i.fa-bed)").text());
+            boolean hasGarage = !el.select("div[title='Garages']:has(i.fa-car)").isEmpty();
+            PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
+                    numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);
@@ -170,6 +173,14 @@ public class ImmotopCrawler {
             return cleanedValue.split("FOR RENT IN")[1].trim();
         }
         throw new RuntimeException("Location not found");
+    }
+
+    private Integer getNumberOfBedrooms(String value) {
+        String cleanedValue = value.replaceAll("\\D", "");
+        if(cleanedValue.isEmpty()) {
+            return null;
+        }
+        return Integer.parseInt(cleanedValue);
     }
 
     private BigDecimal getPrice(String value) {
@@ -200,7 +211,8 @@ public class ImmotopCrawler {
         if (cleanedValue.equals("garage")) {
             return PropertyType.PARKING;
         }
-        if (cleanedValue.equals("industrial-property") || cleanedValue.equals("commercial-property") || cleanedValue.equals("business")) {
+        if (cleanedValue.equals("industrial-property") || cleanedValue.equals("commercial-property")
+                || cleanedValue.equals("business")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
         if (cleanedValue.equals("ground")) {

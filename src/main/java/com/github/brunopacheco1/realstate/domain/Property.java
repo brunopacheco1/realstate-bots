@@ -30,5 +30,7 @@ public class Property extends PanacheMongoEntityBase {
     private TransactionType transactionType;
     private String url;
     private Source source;
+    private Integer numberOfBedrooms;
+    private Boolean hasGarage;
     private LocalDateTime insertionDate;
 }
