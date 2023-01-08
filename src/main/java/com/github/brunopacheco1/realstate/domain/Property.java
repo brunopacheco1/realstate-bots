@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
-import io.quarkus.mongodb.panache.MongoEntity;
 import io.quarkus.mongodb.panache.PanacheMongoEntityBase;
+import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

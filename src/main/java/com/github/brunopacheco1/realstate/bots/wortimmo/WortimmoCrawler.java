@@ -12,12 +12,7 @@ import com.github.brunopacheco1.realstate.api.PropertyType;
 import com.github.brunopacheco1.realstate.api.Source;
 import com.github.brunopacheco1.realstate.api.TransactionType;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.fluent.Request;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jsoup.Jsoup;
@@ -31,7 +26,7 @@ import lombok.extern.java.Log;
 @ApplicationScoped
 @Log
 public class WortimmoCrawler {
-    
+
     @Inject
     @Channel(PubSubConstants.INCOMING_PROPERTY)
     Emitter<PropertyDto> incomingPropertyEmitter;
@@ -39,7 +34,7 @@ public class WortimmoCrawler {
     @Scheduled(cron = "{scheduler.wortimmo}")
     public void produces() {
         log.info("Starting crawling.");
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try {
             int page = 1;
             Integer existingPages = null;
             Integer maxPages = 20;
@@ -49,29 +44,25 @@ public class WortimmoCrawler {
                         break;
                     }
                     String transaction = transactionType == TransactionType.BUY ? "vente" : "location";
-                    String url = "https://www.wortimmo.lu/en/search?property_search_engine%5BtransactionType%5D=" + 
-                        transaction + "&property_search_engine%5Blocation%5D=country-1&property_search_engine%5BpurchasePriceMax%5D=&property_search_engine%5BbedroomMin%5D=&property_search_engine%5Bsubmit%5D=&page=" +
-                        page;
-                    HttpGet get = new HttpGet(url);
+                    String url = "https://www.wortimmo.lu/en/search?property_search_engine%5BtransactionType%5D=" +
+                            transaction
+                            + "&property_search_engine%5Blocation%5D=country-1&property_search_engine%5BpurchasePriceMax%5D=&property_search_engine%5BbedroomMin%5D=&property_search_engine%5Bsubmit%5D=&page="
+                            +
+                            page;
+                    var response = Request.get(url).execute();
 
-                    CloseableHttpResponse response = httpClient.execute(get);
-                    HttpEntity entity = response.getEntity();
-                    if (entity != null) {
-                        Document doc = Jsoup.parse(EntityUtils.toString(entity));
-                        if (existingPages == null) {
-                            int total = getPages(doc.select("div.c-nb-results").text());
-                            existingPages = total % 15 > 0 ? (total / 15) + 1 : (total / 15);
-                        }
-
-                        Elements elements = doc.select("div.property-informations");
-                        elements.forEach(el -> {
-                            getProperty(el, transactionType);
-                        });
-                        page++;
-                        Thread.sleep(1000);
-                        continue;
+                    Document doc = Jsoup.parse(response.returnContent().asString());
+                    if (existingPages == null) {
+                        int total = getPages(doc.select("div.c-nb-results").text());
+                        existingPages = total % 15 > 0 ? (total / 15) + 1 : (total / 15);
                     }
-                    break;
+
+                    Elements elements = doc.select("div.property-informations");
+                    elements.forEach(el -> {
+                        getProperty(el, transactionType);
+                    });
+                    page++;
+                    Thread.sleep(1000);
                 }
             }
         } catch (Exception e) {
@@ -104,18 +95,18 @@ public class WortimmoCrawler {
 
     private Integer getNumberOfBedrooms(String value) {
         String cleanedValue = value.replaceAll("\\D", "");
-        if(cleanedValue.isEmpty()) {
+        if (cleanedValue.isEmpty()) {
             return null;
         }
         return Integer.parseInt(cleanedValue);
     }
 
     private BigDecimal getPrice(String value) {
-        if(value.equalsIgnoreCase("price on request")) {
+        if (value.equalsIgnoreCase("price on request")) {
             return BigDecimal.ZERO;
         }
         String cleanedValue = value.toUpperCase().trim();
-        if(cleanedValue.contains("FROM")) {
+        if (cleanedValue.contains("FROM")) {
             cleanedValue = cleanedValue.split("TO")[0].trim();
         }
         return new BigDecimal(cleanedValue.replaceAll("\\D", ""));
@@ -123,13 +114,18 @@ public class WortimmoCrawler {
 
     private PropertyType getPropertyType(String value) {
         String cleanedValue = value.split("\\/")[3];
-        if (cleanedValue.contains("apartment") || cleanedValue.contains("loft") || cleanedValue.contains("penthouse") || cleanedValue.contains("studio") || cleanedValue.contains("duplex") || cleanedValue.contains("triplex")) {
+        if (cleanedValue.contains("apartment") || cleanedValue.contains("loft") || cleanedValue.contains("penthouse")
+                || cleanedValue.contains("studio") || cleanedValue.contains("duplex")
+                || cleanedValue.contains("triplex")) {
             return PropertyType.APPARTMENT;
         }
         if (cleanedValue.contains("office")) {
             return PropertyType.OFFICE;
         }
-        if (cleanedValue.contains("house-semi-detached") || cleanedValue.contains("cottage") || cleanedValue.contains("joint-house") || cleanedValue.contains("investment-house") || cleanedValue.contains("house") || cleanedValue.contains("detached-house") || cleanedValue.contains("villa")) {
+        if (cleanedValue.contains("house-semi-detached") || cleanedValue.contains("cottage")
+                || cleanedValue.contains("joint-house") || cleanedValue.contains("investment-house")
+                || cleanedValue.contains("house") || cleanedValue.contains("detached-house")
+                || cleanedValue.contains("villa")) {
             return PropertyType.HOUSE;
         }
         if (cleanedValue.contains("parking") || cleanedValue.contains("garage")) {
@@ -141,10 +137,12 @@ public class WortimmoCrawler {
         if (cleanedValue.contains("investment-property")) {
             return PropertyType.PROPERTY;
         }
-        if (cleanedValue.contains("allotment") || cleanedValue.contains("building-residence") || cleanedValue.contains("premises-for-liberal-occupations")) {
+        if (cleanedValue.contains("allotment") || cleanedValue.contains("building-residence")
+                || cleanedValue.contains("premises-for-liberal-occupations")) {
             return PropertyType.NEW_PROPERTY;
         }
-        if(cleanedValue.contains("shop") || cleanedValue.contains("business-takeover") || cleanedValue.contains("commercial-premises") || cleanedValue.contains("catering-hospitality")) {
+        if (cleanedValue.contains("shop") || cleanedValue.contains("business-takeover")
+                || cleanedValue.contains("commercial-premises") || cleanedValue.contains("catering-hospitality")) {
             return PropertyType.COMMERCIAL_PREMISES;
         }
         throw new RuntimeException("PropertyType not found - " + value);

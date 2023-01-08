@@ -11,12 +11,7 @@ import com.github.brunopacheco1.realstate.api.PropertyType;
 import com.github.brunopacheco1.realstate.api.Source;
 import com.github.brunopacheco1.realstate.api.TransactionType;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.fluent.Request;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jsoup.Jsoup;
@@ -37,7 +32,7 @@ public class UelzechtCrawler {
     @Scheduled(cron = "{scheduler.uelzecht}")
     public void produces() {
         log.info("Starting crawling.");
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try {
             int page = 1;
             Integer pages = null;
             while (true) {
@@ -45,27 +40,20 @@ public class UelzechtCrawler {
                     break;
                 }
                 String url = "https://www.uelzecht.lu/index.php?page=recherche&recherche&paging=" + page;
-                HttpPost post = new HttpPost(url);
-
-                CloseableHttpResponse response = httpClient.execute(post);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    Document doc = Jsoup.parse(EntityUtils.toString(entity));
-                    if (pages == null) {
-                        int total = Integer.parseInt(doc.select("div#nb_resultats_text > b.pink_title").text());
-                        pages = total % 15 > 0 ? (total / 15) + 1 : (total / 15);
-                    }
-
-                    Elements properties = doc.select("div.content_annonce_bien");
-                    properties.forEach(el -> {
-                        getProperty(el);
-                    });
-                    page++;
-                    
-                    Thread.sleep(1000);
-                    continue;
+                var response = Request.post(url).execute();
+                Document doc = Jsoup.parse(response.returnContent().asString());
+                if (pages == null) {
+                    int total = Integer.parseInt(doc.select("div#nb_resultats_text > b.pink_title").text());
+                    pages = total % 15 > 0 ? (total / 15) + 1 : (total / 15);
                 }
-                break;
+
+                Elements properties = doc.select("div.content_annonce_bien");
+                properties.forEach(el -> {
+                    getProperty(el);
+                });
+                page++;
+
+                Thread.sleep(1000);
             }
         } catch (Exception e) {
             log.log(Level.WARNING, e.getMessage(), e);

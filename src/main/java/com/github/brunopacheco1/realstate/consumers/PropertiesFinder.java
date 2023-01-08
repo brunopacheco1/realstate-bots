@@ -14,7 +14,6 @@ import com.github.brunopacheco1.realstate.domain.Filter;
 import com.github.brunopacheco1.realstate.domain.Notification;
 import com.github.brunopacheco1.realstate.domain.Property;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -22,6 +21,7 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 
 import io.quarkus.mongodb.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import io.smallrye.mutiny.tuples.Tuple2;
 import io.smallrye.reactive.messaging.annotations.Merge;
 
 @ApplicationScoped
@@ -35,8 +35,8 @@ public class PropertiesFinder {
     @Merge
     public CompletionStage<Void> findProperties(Message<Filter> message) {
         Filter filter = message.getPayload();
-        Pair<String, Map<String, Object>> query = getQuery(filter);
-        PanacheQuery<Property> properties = Property.find(query.getLeft(), query.getRight());
+        Tuple2<String, Map<String, Object>> query = getQuery(filter);
+        PanacheQuery<Property> properties = Property.find(query.getItem1(), query.getItem2());
         properties.page(Page.ofSize(25));
         do {
             Set<String> urls = properties.list().stream().map(Property::getUrl).collect(Collectors.toSet());
@@ -47,7 +47,7 @@ public class PropertiesFinder {
         return message.ack();
     }
 
-    private Pair<String, Map<String, Object>> getQuery(Filter filter) {
+    private Tuple2<String, Map<String, Object>> getQuery(Filter filter) {
         Map<String, Object> params = new HashMap<>();
         params.put("transactionType", filter.getTransactionType());
         String query = "transactionType = :transactionType";
@@ -59,6 +59,6 @@ public class PropertiesFinder {
             params.put("propertyType", filter.getPropertyType());
             query += " and propertyType = :propertyType";
         }
-        return Pair.of(query, params);
+        return Tuple2.of(query, params);
     }
 }

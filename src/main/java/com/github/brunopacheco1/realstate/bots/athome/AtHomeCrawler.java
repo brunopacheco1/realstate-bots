@@ -11,12 +11,7 @@ import com.github.brunopacheco1.realstate.api.PropertyType;
 import com.github.brunopacheco1.realstate.api.Source;
 import com.github.brunopacheco1.realstate.api.TransactionType;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.fluent.Request;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jsoup.Jsoup;
@@ -37,7 +32,7 @@ public class AtHomeCrawler {
     @Scheduled(cron = "{scheduler.athome}")
     public void produces() {
         log.info("Starting crawling.");
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try {
             int page = 1;
             Integer existingPages = null;
             Integer maxPages = 20;
@@ -48,27 +43,22 @@ public class AtHomeCrawler {
                     }
                     String url = "https://www.athome.lu/en/srp/?tr=" + transactionType.name().toLowerCase()
                             + "&sort=date_desc&q=faee1a4a&loc=L2-luxembourg&page=" + page;
-                    HttpGet get = new HttpGet(url);
 
-                    CloseableHttpResponse response = httpClient.execute(get);
-                    HttpEntity entity = response.getEntity();
-                    if (entity != null) {
-                        Document doc = Jsoup.parse(EntityUtils.toString(entity));
-                        if (existingPages == null) {
-                            int total = getPages(doc.select("div.paginator > p").text());
-                            existingPages = total % 20 > 0 ? (total / 20) + 1 : (total / 20);
-                        }
-
-                        Elements elements = doc.select("article");
-                        elements.forEach(el -> {
-                            getProperty(el, transactionType);
-                        });
-                        page++;
-
-                        Thread.sleep(1000);
-                        continue;
+                    var response = Request.get(url).execute();
+                    var responseContent = response.returnContent().asString();
+                    Document doc = Jsoup.parse(responseContent);
+                    if (existingPages == null) {
+                        int total = getPages(doc.select("div.paginator > p").text());
+                        existingPages = total % 20 > 0 ? (total / 20) + 1 : (total / 20);
                     }
-                    break;
+
+                    Elements elements = doc.select("article");
+                    elements.forEach(el -> {
+                        getProperty(el, transactionType);
+                    });
+                    page++;
+
+                    Thread.sleep(1000);
                 }
             }
         } catch (Exception e) {
