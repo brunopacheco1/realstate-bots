@@ -1,8 +1,8 @@
 package com.github.brunopacheco1.realstate.bots.remax;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.logging.Level;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -18,11 +18,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.java.Log;
@@ -40,7 +38,7 @@ public class RemaxCrawler {
         log.info("Starting crawling.");
 
         try {
-            WebDriver driver = initPhantomJS();
+            WebDriver driver = initWebDriver();
             for (TransactionType transactionType : TransactionType.values()) {
                 int page = 1;
                 Integer maxPages = 5;
@@ -80,26 +78,10 @@ public class RemaxCrawler {
         return driver.getPageSource();
     }
 
-    public WebDriver initPhantomJS() {
-        String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36";
-
-        DesiredCapabilities desiredCaps = new DesiredCapabilities();
-        desiredCaps.setCapability("takesScreenshot", false);
-        desiredCaps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
-                "/usr/local/bin/phantomjs");
-        desiredCaps.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_CUSTOMHEADERS_PREFIX + "User-Agent",
-                USER_AGENT);
-
-        ArrayList<String> cliArgsCap = new ArrayList<>();
-        cliArgsCap.add("--web-security=false");
-        cliArgsCap.add("--ssl-protocol=any");
-        cliArgsCap.add("--ignore-ssl-errors=true");
-        cliArgsCap.add("--webdriver-loglevel=ERROR");
-
-        desiredCaps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-        WebDriver driver = new PhantomJSDriver(desiredCaps);
-        driver.manage().window().setSize(new Dimension(1920, 1080));
-        return driver;
+    public WebDriver initWebDriver() {
+        var options = new ChromeOptions();
+        options.addArguments("--headless");
+        return new ChromeDriver(options);
     }
 
     private void getProperty(Element el, TransactionType transactionType) {
@@ -146,25 +128,29 @@ public class RemaxCrawler {
 
     private PropertyType getPropertyType(String value) {
         String cleanedValue = value.toUpperCase().trim();
-        if (cleanedValue.contains("HOUSE") || cleanedValue.contains("VILLA") || cleanedValue.contains("CHALET")) {
-            return PropertyType.HOUSE;
+        switch (cleanedValue) {
+            case "HOUSE":
+            case "VILLA":
+            case "CHALET":
+                return PropertyType.HOUSE;
+            case "GARAGE":
+            case "PARKING SPACE":
+                return PropertyType.PARKING;
+            case "LAND":
+                return PropertyType.LAND;
+            case "BUILDING":
+            case "STORAGE CONDO":
+                return PropertyType.PROPERTY;
+            case "ROOM":
+                return PropertyType.ROOM;
+            case "APARTMENT":
+            case "STUDIO":
+            case "APPARTMENT":
+            case "DUPLEX":
+            case "PENTHOUSE":
+                return PropertyType.APPARTMENT;
+            default:
+                throw new RuntimeException("PropertyType not found - " + value);
         }
-        if (cleanedValue.contains("GARAGE")) {
-            return PropertyType.PARKING;
-        }
-        if (cleanedValue.contains("LAND")) {
-            return PropertyType.LAND;
-        }
-        if (cleanedValue.contains("BUILDING")) {
-            return PropertyType.PROPERTY;
-        }
-        if (cleanedValue.contains("ROOM")) {
-            return PropertyType.ROOM;
-        }
-        if (cleanedValue.contains("APARTMENT") || cleanedValue.contains("STUDIO") || cleanedValue.contains("APPARTMENT")
-                || cleanedValue.contains("DUPLEX") || cleanedValue.contains("PENTHOUSE")) {
-            return PropertyType.APPARTMENT;
-        }
-        throw new RuntimeException("PropertyType not found - " + value);
     }
 }
