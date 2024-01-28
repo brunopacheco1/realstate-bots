@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class Notification {
     private Set<String> recipients;
     private String url;
+    private String location;
 }

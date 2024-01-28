@@ -23,7 +23,7 @@ public class NotificationSender {
     @Merge
     public CompletionStage<Void> percolate(Message<Notification> message) {
         Notification notification = message.getPayload();
-        Payload payload = Payload.builder().text(notification.getUrl()).build();
+        Payload payload = Payload.builder().text(notification.getUrl() + " - " + notification.getLocation()).build();
         try {
             for (String recipient : notification.getRecipients()) {
                 Slack.getInstance().send(recipient, payload);

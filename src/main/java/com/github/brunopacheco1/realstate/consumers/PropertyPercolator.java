@@ -73,7 +73,7 @@ public class PropertyPercolator {
         Set<String> recipients = root.query(query);
 
         if (!recipients.isEmpty()) {
-            Notification notification = new Notification(recipients, property.getUrl());
+            Notification notification = new Notification(recipients, property.getUrl(), property.getLocation());
             notificationEmitter.send(notification);
         }
         return message.ack();

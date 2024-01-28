@@ -39,9 +39,8 @@ public class PropertiesFinder {
         PanacheQuery<Property> properties = Property.find(query.getItem1(), query.getItem2());
         properties.page(Page.ofSize(25));
         do {
-            Set<String> urls = properties.list().stream().map(Property::getUrl).collect(Collectors.toSet());
-            for (String url : urls) {
-                notificationEmitter.send(new Notification(filter.getRecipients(), url));
+            for (var property : properties.list()) {
+                notificationEmitter.send(new Notification(filter.getRecipients(), property.getUrl(), property.getLocation()));
             }
         } while (properties.hasNextPage());
         return message.ack();

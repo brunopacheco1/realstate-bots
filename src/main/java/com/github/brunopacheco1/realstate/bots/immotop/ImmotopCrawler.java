@@ -73,7 +73,7 @@ public class ImmotopCrawler {
         var pageString = page == 1 ? "" : "&pag=" + page;
         var transactionTypeInImmotop = transactionType == TransactionType.BUY ? "vente" : "location";
         var url = "https://www.immotop.lu/en/" + transactionTypeInImmotop
-                + "-maisons-appartements/luxembourg-pays/?criterio=rilevanza&noAste=1" + pageString;
+                + "-maisons-appartements/luxembourg-pays/?criterio=dataModifica&ordine=desc&noAste=1" + pageString;
 
         driver.get(url);
         Thread.sleep(2000);
