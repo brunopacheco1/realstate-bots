@@ -5,14 +5,26 @@ Content-Type: application/json
   "budget": 550000,
   "propertyType": "HOUSE",
   "transactionType": "BUY",
+  "numberOfBedrooms": 4,
   "recipients": [
-    "https://hooks.slack.com/services/sampleslackhook1",
-    "https://hooks.slack.com/services/sampleslackhook2"
+    "https://hooks.slack.com/services/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"
   ]
 }
 
 ###
 
-POST http://localhost:8080/api/v1/filter/{id}/run
+POST http://localhost:8080/api/v1/filter/65b68121a788d3310fb07183/run
 
 ###
+
+POST http://localhost:8080/api/v1/filter
+Content-Type: application/json
+
+{
+  "budget": 2000,
+  "propertyType": "APPARTMENT",
+  "transactionType": "RENT",
+  "recipients": [
+    "https://hooks.slack.com/services/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"
+  ]
+}
