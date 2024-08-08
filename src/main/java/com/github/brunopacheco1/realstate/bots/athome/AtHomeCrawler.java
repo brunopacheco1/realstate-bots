@@ -72,11 +72,12 @@ public class AtHomeCrawler {
             String urlSuffix = el.select("link").attr("href");
             String propertyUrl = "https://www.athome.lu" + urlSuffix;
             PropertyType propertyType = getPropertyType(urlSuffix);
-            String location = el.select("span[itemprop=addressLocality]").text().toUpperCase();
-            BigDecimal value = getPrice(el.select("ul.mainInfos > li.propertyPrice").text());
+            String location = el.select("span.property-card-immotype-location-city").text().toUpperCase();
+            BigDecimal value = getPrice(el.select("span.property-card-price").text());
             Source source = Source.ATHOME;
-            Integer numberOfBedrooms = getNumberOfBedrooms(el.select("ul.characterstics > li:has(i.icon-bed)").text());
-            Boolean hasGarage = !el.select("ul.characterstics > li:has(i.icon-car)").isEmpty();
+            Integer numberOfBedrooms = getNumberOfBedrooms(
+                    el.select("ul.property-card-info-icons > li.item-rooms").text());
+            Boolean hasGarage = !el.select("ul.property-card-info-icons > li.item-garages").isEmpty();
             PropertyDto property = new PropertyDto(location, value, propertyType, transactionType, propertyUrl, source,
                     numberOfBedrooms, hasGarage);
             incomingPropertyEmitter.send(property);
